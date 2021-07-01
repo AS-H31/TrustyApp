@@ -24,11 +24,7 @@ const Filter = ({ auth }) => {
   }
   // Push to Craftsmen Details
   const craftsmenDetails = id => {
-    if (auth) {
       history.push(`/work/${id}`)
-    }else{
-      alert('Please Login/Sign Up!')
-    }
   }
   // Page load 
   useEffect(()=>{
