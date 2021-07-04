@@ -55,11 +55,43 @@ const WorkProfile = () => {
     .catch(err=> alert(err.response.data.error.description))
 
   }
+  // Delete Review Function
+  const deleteReview = reviewID => {
+    axios.delete(`${process.env.REACT_APP_BASE_URL}/reviews/${id}/${reviewID}`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`
+      }
+    })
+    .then(()=> {
+      fetchingReviews()
+      fetchCraftsmenDetails()
+    })
+    .catch(err=> alert(err.response.data.error.description))
+  }
+  // Show Delete Button
+  const deleteButton = (userId, reviewid) =>{
+    const tempUserType = sessionStorage.getItem('userType');
+    const tempUser = JSON.parse(sessionStorage.getItem('user'));
+    if (tempUserType === 'customer' && tempUser.user.id === userId) {
+      return(
+          <span>
+            <span className="text-gray-500 font-medium">&middot;</span>{' '}
+            <button
+                onClick={() => deleteReview(reviewid)}
+                type="button"
+                className="inline-flex self-end items-center ml-2 px-2 py-1 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
+            >
+              Delete
+            </button>
+          </span>
+      )
+    }
 
+  }
   // Getting Craftsmen Reviews
   const fetchingReviews = () => {
     axios.get(`${process.env.REACT_APP_BASE_URL}/reviews/${id}`)
-    .then(res => {setReviews(res.data.data);console.log(res.data.data)})
+    .then(res => {setReviews(res.data.data)})
     .catch(err=> alert(err.response.data.error.description))
   }
   // Show Review Post Box
@@ -132,7 +164,7 @@ const WorkProfile = () => {
               <div className="px-4 py-6 sm:px-6">
                 <ul className="space-y-8">
                   {
-                    reviews.length
+                    reviews
                         ? reviews.map((review) => (
                             <li key={review.id}>
                               <div className="flex space-x-3">
@@ -143,7 +175,7 @@ const WorkProfile = () => {
                                       alt=""
                                   />
                                 </div>
-                                <div>
+                                <div className="w-full">
                                   <div className="text-sm">
                                     <div className="font-bold text-gray-900">
                                       {review.customer.full_name}
@@ -152,12 +184,13 @@ const WorkProfile = () => {
                                   <div className="mt-1 text-sm text-gray-700">
                                     <p>{review.body}</p>
                                   </div>
-                                  <div className="mt-2 text-sm space-x-2">
+                                  <div className="mt-2 text-sm space-x-2 w-full">
                                     <span className="text-gray-500 font-medium">{review.created_at_human}</span>{' '}
                                     <span className="text-gray-500 font-medium">&middot;</span>{' '}
                                     <span className="text-gray-500 font-medium">Rating: &nbsp;
                                       <span className="font-bold">{review.rating}</span>
-                              </span>
+                                    </span>
+                                    {deleteButton(review.from_id, review.id)}
                                   </div>
                                 </div>
                               </div>
